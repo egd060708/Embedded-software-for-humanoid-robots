@@ -26,12 +26,14 @@ TaskHandle_t IMU_Handle;
 TaskHandle_t DR16_Handle;
 TaskHandle_t FS_I6X_Handle;
 TaskHandle_t Rx_Referee_Handle;
+TaskHandle_t BETAFPV_Handle;
 /* Private function declarations ---------------------------------------------*/
 void tskDjiMotor(void *arg);
 void tskFS_I6X(void *arg);
 void tskIMU(void *arg);
 void tskDR16(void *arg);
 void Rx_Referee(void *arg);
+void tskBETAFPV(void *arg);
 
 uint8_t is_going = 0;
 float clk1 = 0;
@@ -55,6 +57,7 @@ void Service_Devices_Init(void)
 #if USE_SRML_DR16
 	xTaskCreate(tskDR16, "App.DR16", Small_Stack_Size, NULL, PrioritySuperHigh, &DR16_Handle);
 #endif
+	xTaskCreate(tskBETAFPV, "App.BETAFPV", Small_Stack_Size, NULL, PrioritySuperHigh, &BETAFPV_Handle);
 
 #if USE_SRML_FS_I6X
 	xTaskCreate(tskFS_I6X, "App.FS_I6X", Small_Stack_Size, NULL, PrioritySuperHigh, &FS_I6X_Handle);
@@ -175,6 +178,46 @@ void tskIMU(void *arg)
 	}
 }
 #endif
+
+/**
+ *	@brief	BETAFPV data receive task
+ */
+void tskBETAFPV(void *arg)
+{
+	/* Cache for Task */
+	USART_COB Rx_Package;
+	/* Pre-Load for task */
+	BETAFPV.Check_Link(xTaskGetTickCount());
+	/* Infinite loop */
+	for (;;)
+	{
+		/* Enter critical */
+		xSemaphoreTake(BETAFPV_mutex, portMAX_DELAY);
+		/*	等待数据	*/
+		if (xQueueReceive(BETAFPV_QueueHandle, &Rx_Package, 100) == pdPASS)
+		{
+			// Read Message
+			BETAFPV.DataCapture((uint8_t *)Rx_Package.address);
+		}
+		/*	检测遥控器连接 */
+		BETAFPV.Check_Link(xTaskGetTickCount());
+		/*	判断是否连接 	 */
+		if (BETAFPV.GetStatus() != ESTABLISHED)
+		{
+			/**
+			 * lost the remote control
+			 */
+
+			/* Leave critical */
+			xSemaphoreGive(BETAFPV_mutex);
+			continue;
+		}
+		/*	更新遥控器控制	*/
+
+		/* Leave critical */
+		xSemaphoreGive(BETAFPV_mutex);
+	}
+}
 
 #if USE_SRML_DR16
 /**

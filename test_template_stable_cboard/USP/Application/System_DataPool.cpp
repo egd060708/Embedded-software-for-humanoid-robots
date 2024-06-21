@@ -20,12 +20,14 @@ QueueHandle_t CAN2_RxPort;      //	can2 接收队列
 #if USE_SRML_DR16
 QueueHandle_t DR16_QueueHandle; //	dr16（串口） 接收队列
 #endif
+QueueHandle_t BETAFPV_QueueHandle;
 /* Semaphores */
 
 /* Mutexes */
 #if USE_SRML_DR16
 SemaphoreHandle_t DR16_mutex; //	dr16互斥量
 #endif
+SemaphoreHandle_t BETAFPV_mutex;
 
 /* Notifications */
 
@@ -41,6 +43,7 @@ __CCM mpu_rec_s mpu_receive; // mpu6050数据
 #if USE_SRML_DR16
 __CCM DR16_Classdef DR16; // 遥控器DR16类
 #endif
+__CCM BETAFPV_Classdef BETAFPV; // 遥控器BETAFPV
 
 #if USE_SRML_FS_I6X
 __CCM FS_I6X_Classdef remote;

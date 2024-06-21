@@ -63,6 +63,7 @@ void System_Device_Init(void)
 #else
 //  Uart_Init(&huart2, NULL, UART2_RX_BUFFER_SIZE, UART2_RxCpltCallback);
 #endif
+		Uart_Init(&huart6, NULL, UART2_RX_BUFFER_SIZE, BETAFPV_RxCpltCallback);
 
 #if USE_SRML_REFEREE
   Uart_Init(&huart6, NULL, UART6_RX_BUFFER_SIZE, Referee_recv_Callback);
@@ -110,11 +111,13 @@ void System_Task_Init(void)
 #if USE_SRML_DR16
   DR16_QueueHandle = xQueueCreate(3, sizeof(USART_COB));
 #endif
+	BETAFPV_QueueHandle = xQueueCreate(3, sizeof(USART_COB));
 /* Semaphore Init */
 /* Mutex Init */
 #if USE_SRML_DR16
   DR16_mutex = xSemaphoreCreateMutex();
 #endif
+	BETAFPV_mutex = xSemaphoreCreateMutex();
   /* Task Init */
   Service_Communication_Init();
   Service_Devices_Init();

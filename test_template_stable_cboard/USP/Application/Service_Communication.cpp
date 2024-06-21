@@ -306,6 +306,20 @@ uint32_t User_UART_RxCpltCallback(uint8_t *Recv_Data, uint16_t ReceiveLen)
   return 0;
 }
 
+uint32_t BETAFPV_RxCpltCallback(uint8_t *Recv_Data, uint16_t ReceiveLen)
+{
+  USART_COB Usart_RxCOB;
+  BaseType_t xHigherPriorityTaskWoken;
+  // Send To UART Receive Queue
+  if (BETAFPV_QueueHandle != NULL)
+  {
+    Usart_RxCOB.len = ReceiveLen;
+    Usart_RxCOB.address = Recv_Data;
+    xQueueSendFromISR(BETAFPV_QueueHandle, &Usart_RxCOB, &xHigherPriorityTaskWoken);
+  }
+  return 0;
+}
+
 #if USE_SRML_DR16
 uint32_t DR16_RxCpltCallback(uint8_t *Recv_Data, uint16_t ReceiveLen)
 {

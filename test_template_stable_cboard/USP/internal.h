@@ -17,6 +17,7 @@
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
+#include "BETAFPV.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,11 +56,13 @@ extern QueueHandle_t CAN2_RxPort;
 #if USE_SRML_DR16
 extern QueueHandle_t DR16_QueueHandle;
 #endif
+extern QueueHandle_t BETAFPV_QueueHandle;
 /* Semaphores */
 /* mutex */
 #if USE_SRML_DR16
 extern SemaphoreHandle_t DR16_mutex;
 #endif
+extern SemaphoreHandle_t BETAFPV_mutex;
 /* Mutexes */
 /* Notifications */
 /* Other Resources -----------------------------------------------------------*/
@@ -74,6 +77,7 @@ extern mpu_rec_s mpu_receive; //mpu6050传感器
 #if  USE_SRML_DR16
 extern DR16_Classdef DR16;		//遥控器DR16类
 #endif
+extern BETAFPV_Classdef BETAFPV;
 
 #if USE_SRML_FS_I6X
 extern FS_I6X_Classdef remote;
@@ -128,6 +132,7 @@ extern User_Uart_Callback UART6_RxCpltCallback;
 #if USE_SRML_DR16
 uint32_t DR16_RxCpltCallback(uint8_t *Recv_Data, uint16_t ReceiveLen);
 #endif
+uint32_t BETAFPV_RxCpltCallback(uint8_t *Recv_Data, uint16_t ReceiveLen);
 
 #if USE_SRML_FS_I6X
 uint32_t FS_I6X_RxCpltCallback(uint8_t *Recv_Data, uint16_t ReceiveLen);
